@@ -1,0 +1,84 @@
+{
+  "name": "ledgera-desktop",
+  "version": "1.1.1",
+  "private": true,
+  "description": "Ledgera — Compliance management for Indian Chartered Accountants",
+  "author": {
+    "name": "Ledgera Technologies Pvt. Ltd.",
+    "email": "support@ledgera.co.in"
+  },
+  "homepage": "https://ledgera.co.in",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder",
+    "dist:win": "electron-builder --win",
+    "dist:mac": "electron-builder --mac",
+    "dist:linux": "electron-builder --linux"
+  },
+  "devDependencies": {
+    "electron": "^33.2.0",
+    "electron-builder": "^25.1.8"
+  },
+  "build": {
+    "appId": "co.in.ledgera.desktop",
+    "productName": "Ledgera",
+    "executableName": "Ledgera",
+    "copyright": "Copyright © 2026 Ledgera Technologies Pvt. Ltd.",
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "files": [
+      "main.js",
+      "preload.js",
+      "package.json",
+      "renderer/**/*"
+    ],
+    "mac": {
+      "target": "dmg",
+      "artifactName": "Ledgera-mac.${ext}",
+      "category": "public.app-category.business",
+      "identity": null,
+      "darkModeSupport": true
+    },
+    "dmg": {
+      "title": "Ledgera",
+      "writeUpdateInfo": false
+    },
+    "win": {
+      "target": "nsis",
+      "artifactName": "Ledgera-windows.${ext}",
+      "icon": "build/icon.png",
+      "publisherName": "Ledgera Technologies Pvt. Ltd.",
+      "legalTrademarks": "Ledgera is a trademark of Ledgera Technologies Pvt. Ltd.",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "perMachine": false,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Ledgera",
+      "uninstallDisplayName": "Ledgera",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico"
+    },
+    "linux": {
+      "target": "AppImage",
+      "artifactName": "Ledgera-linux.${ext}",
+      "category": "Office",
+      "desktop": {
+        "Name": "Ledgera",
+        "Comment": "Compliance management for Indian CAs",
+        "Terminal": "false"
+      }
+    },
+    "publish": {
+      "provider": "github",
+      "owner": "Pavanchandar77",
+      "repo": "Ledgera-desktop"
+    }
+  }
+}

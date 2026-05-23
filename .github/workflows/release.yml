@@ -1,0 +1,84 @@
+name: Build & Sign Desktop Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+  id-token: write  # Required for SignPath
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build unsigned installer
+        run: npx electron-builder --win
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload unsigned artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ledgera-windows-unsigned
+          path: dist/Ledgera-windows.exe
+
+  sign-windows:
+    needs: build-windows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download unsigned artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Ledgera-windows-unsigned
+          path: artifacts
+
+      - name: Sign with SignPath
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ secrets.SIGNPATH_ORG_ID }}
+          project-slug: ledgera-desktop
+          signing-policy-slug: release-signing
+          artifact-configuration-slug: windows-exe
+          input-artifact-path: artifacts/Ledgera-windows.exe
+          output-artifact-path: artifacts/Ledgera-windows-signed.exe
+          wait-for-completion: true
+          wait-for-completion-timeout-in-seconds: 600
+
+      - name: Upload signed artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Ledgera-windows-signed
+          path: artifacts/Ledgera-windows-signed.exe
+
+  release:
+    needs: sign-windows
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download signed artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: Ledgera-windows-signed
+          path: artifacts
+
+      - name: Rename artifact
+        run: mv artifacts/Ledgera-windows-signed.exe artifacts/Ledgera-windows.exe
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: artifacts/Ledgera-windows.exe
+          generate_release_notes: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

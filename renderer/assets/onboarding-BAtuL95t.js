@@ -1,0 +1,1 @@
+function r(o){try{const a=localStorage.getItem("onboarding_checked"),e=a?JSON.parse(a):[];e.includes(o)||(e.push(o),localStorage.setItem("onboarding_checked",JSON.stringify(e)))}catch(a){}}export{r as m};
